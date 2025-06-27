@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>1.2.2 – Triangle Solver</title>
+</head>
+<body>
+  <script>
+    console.log("Інструкція: triangle(value1, type1, value2, type2) ");
+    console.log("Можливі типи:");
+    console.log("'leg', 'hypotenuse', 'adjacent angle', 'opposite angle', 'angle'");
+    console.log("Приклад: triangle(4, 'leg', 8, 'hypotenuse');");
+
+    function triangle(val1, type1, val2, type2) {
+      const toRadians = deg => deg * Math.PI / 180;
+      const toDegrees = rad => rad * 180 / Math.PI;
+
+      const validTypes = ["leg", "hypotenuse", "adjacent angle", "opposite angle", "angle"];
+      type1 = type1.toLowerCase();
+      type2 = type2.toLowerCase();
+
+      
+      if (!validTypes.includes(type1) || !validTypes.includes(type2)) {
+        console.log("Неправильний тип аргумента. Перечитайте інструкцію.");
+        return "failed";
+      }
+
+      
+      if (val1 <= 0 || val2 <= 0) {
+        const msg = "Значення повинні бути додатними (не 0 і не від’ємні).";
+        console.log(msg);
+        return msg;
+      }
+
+      
+      if ((validTypes.includes(type1) && type1.includes("angle") && (val1 <= 0 || val1 >= 90)) ||
+          (validTypes.includes(type2) && type2.includes("angle") && (val2 <= 0 || val2 >= 90))) {
+        const msg = "Кути мають бути гострими (від 0 до 90, не включно).";
+        console.log(msg);
+        return msg;
+      }
+
+      const values = {
+        "leg": null,
+        "hypotenuse": null,
+        "adjacent angle": null,
+        "opposite angle": null,
+        "angle": null
+      };
+
+      values[type1] = val1;
+      values[type2] = val2;
+
+      let a, b, c, alpha, beta;
+
+      
+
+      if (type1 === "leg" && type2 === "leg") {
+        a = val1;
+        b = val2;
+        c = Math.sqrt(a ** 2 + b ** 2);
+        alpha = toDegrees(Math.asin(a / c));
+        beta = 90 - alpha;
+      }
+      else if ((type1 === "leg" && type2 === "hypotenuse") || (type2 === "leg" && type1 === "hypotenuse")) {
+        if (type1 === "leg") {
+          a = val1;
+          c = val2;
+        } else {
+          a = val2;
+          c = val1;
+        }
+        if (a >= c) {
+          const msg = "Катет не може бути більшим або рівним гіпотенузі.";
+          console.log(msg);
+          return msg;
+        }
+        b = Math.sqrt(c ** 2 - a ** 2);
+        alpha = toDegrees(Math.asin(a / c));
+        beta = 90 - alpha;
+      }
+      else if ((type1 === "leg" && type2 === "opposite angle") || (type2 === "leg" && type1 === "opposite angle")) {
+        if (type1 === "leg") {
+          a = val1;
+          alpha = val2;
+        } else {
+          a = val2;
+          alpha = val1;
+        }
+        c = a / Math.sin(toRadians(alpha));
+        b = Math.sqrt(c ** 2 - a ** 2);
+        beta = 90 - alpha;
+      }
+      else if ((type1 === "leg" && type2 === "adjacent angle") || (type2 === "leg" && type1 === "adjacent angle")) {
+        if (type1 === "leg") {
+          b = val1;
+          beta = val2;
+        } else {
+          b = val2;
+          beta = val1;
+        }
+        c = b / Math.cos(toRadians(beta));
+        a = Math.sqrt(c ** 2 - b ** 2);
+        alpha = 90 - beta;
+      }
+      else if ((type1 === "hypotenuse" && type2 === "angle") || (type2 === "hypotenuse" && type1 === "angle")) {
+        if (type1 === "hypotenuse") {
+          c = val1;
+          alpha = val2;
+        } else {
+          c = val2;
+          alpha = val1;
+        }
+        a = c * Math.sin(toRadians(alpha));
+        b = Math.sqrt(c ** 2 - a ** 2);
+        beta = 90 - alpha;
+      }
+      else {
+        console.log("Несумісна пара типів. Перечитайте інструкцію.");
+        return "failed";
+      }
+
+      
+      if ([a, b, c, alpha, beta].some(x => isNaN(x) || x <= 0)) {
+        const msg = "Обчислення призвело до некоректних значень. Перевірте вхідні дані.";
+        console.log(msg);
+        return msg;
+      }
+
+      
+      console.log("a (катет): " + a.toFixed(2));
+      console.log("b (катет): " + b.toFixed(2));
+      console.log("c (гіпотенуза): " + c.toFixed(2));
+      console.log("alpha (кут навпроти a): " + alpha.toFixed(2) + "°");
+      console.log("beta (кут навпроти b): " + beta.toFixed(2) + "°");
+
+      return "success";
+    }
+
+    
+    console.log("Результат: " + triangle(4, "leg", 8, "hypotenuse"));      
+    console.log("Результат: " + triangle(4, "leg", 4, "hypotenuse"));      
+    console.log("Результат: " + triangle(60, "angle", 13, "hypotenus"));   
+    console.log("Результат: " + triangle(5, "angle", 30, "angle"));        
+    console.log("Результат: " + triangle(-3, "leg", 4, "leg"));            
+    console.log("Результат: " + triangle(3, "leg", 0, "opposite angle"));  
+    console.log("Результат: " + triangle(3, "leg", 90, "opposite angle")); 
+  </script>
+</body>
+</html>
